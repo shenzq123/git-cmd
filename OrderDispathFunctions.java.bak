@@ -133,6 +133,15 @@ public class OrderDispatchFunctions extends LogicUtil {
     vCriteria.add("ORDERNO = " + orderDataBean.getTempOrderNo());
     List<VOTEMPORD> vTempOrd = TblTEMPORD.getVOVector(this.dao, vCriteria);
 
+    for (VOTEMPORD voTempOrd : vTempOrd) {
+      /*
+       * Case 28260
+       */
+      if (voTempOrd.getRXNUMBER().length() == 0
+          && (!billPeriodChanged || billPeriodChanged && voTempOrd.getITEMTYPE().startsWith("R"))) {
+        this.changePricesByItem(orderDataBean, voTempOrd, "", 0);
+        TblTEMPORD.update(this.dao, voTempOrd, this.today, this.sEmployeeNo);
+      }
     }
   }
 
@@ -141,7 +150,23 @@ public class OrderDispatchFunctions extends LogicUtil {
     if (isNotBlank(sDefaultPrice)) {
       price.setUnitPrice(Double.parseDouble(sDefaultPrice));
       price.setSalePrice(Double.parseDouble(sDefaultPrice));
-      price.s
+      price.setDailyRate(Double.parseDouble(sDefaultPrice));
+      price.setWkRate(Double.parseDouble(sDefaultPrice));
+      price.setMonRate(Double.parseDouble(sDefaultPrice));
+
+      if (new BigDecimal(sDefaultPrice).compareTo(BigDecimal.ZERO) > 0 && packageId > 0) {
+        Formatter f = new Formatter();
+        f.format("SELECT DRATE, WRATE, MRATE FROM PKHDR WITH(NOLOCK)");
+        f.format(" WHERE PKHDRSEQ = %s", packageId);
+        RowSet rs = dao.Exce_Select(f.toString());
+        if (rs.next()) {
+          price.setUnitPrice(Double.parseDouble(sDefaultPrice));
+          price.setSalePrice(Double.parseDouble(sDefaultPrice));
+          price.setDailyRate(rs.getDouble("DRATE"));
+          price.setWkRate(rs.getDouble("WRATE"));
+          price.setMonRate(rs.getDouble("MRATE"));
+        }
+      }
     }
   }
 
