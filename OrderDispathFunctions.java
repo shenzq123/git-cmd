@@ -87,17 +87,7 @@ import com.meds.util.LogicUtil;
 import com.meds.util.MedeqTableUtil;
 import com.meds.util.PriceUtil;
 import com.meds.util.StringUtil;
-import com.meds.util.TaxUtil;
-import com.meds.util.ValidationDataBean;
-import com.meds.vo.VOCUSTOMER;
-import com.meds.vo.VOGCHDR;
-import com.meds.vo.VOHCPCS_SPAN;
-import com.meds.vo.VOHER_ORDER;
-import com.meds.vo.VONOTESDTL;
-import com.meds.vo.VOORDAUTH;
-import com.meds.vo.VOORDAUTHCommon;
-import com.meds.vo.VOORDDTL;
-import com.meds.vo.VOORDDTLCommon;
+
 import com.meds.vo.VOORDDTL_HIST;
 import com.meds.vo.VOORDHDR;
 import com.meds.vo.VOORDHDRCommon;
@@ -143,24 +133,6 @@ public class OrderDispatchFunctions extends LogicUtil {
       price.setSalePrice(Double.parseDouble(sDefaultPrice));
       price.s
     }
-  }
-
-  public void changePricesByItem(OrderDataBean orderDataBean, VOTEMPORD voTempOrd, String sDefaultPrice,
-      int packageId) throws DAOException, SQLException, MedeqException {
-    PriceUtil price = new PriceUtil(this.dao, orderDataBean.getOfficeNo(), orderDataBean.getBillID(),
-        voTempOrd.getITEMTYPE().equals("SALE") ? "SINV" : "RINV", voTempOrd.getMAKE(), voTempOrd.getPARTNO(),
-        voTempOrd.getITEMTYPE().equals("SALE") ? "SINV" : "RINV", voTempOrd.getACTUALUOM(), this.today,
-        orderDataBean.getBillPeriod(), orderDataBean.getShipToState(), orderDataBean.getShipToZip(),
-        StringUtils.isNotBlank(voTempOrd.getINSURANCE()) ? voTempOrd.getINSURANCE()
-            : orderDataBean.getInsurance(),
-        (orderDataBean.getFileClaim().equals("Y") ? true : false)
-            && (voTempOrd.getCLAIM().equals("Y") ? true : false),
-        voTempOrd.getMODIFIER1(), voTempOrd.getMODIFIER2(), orderDataBean.getOrderDate(), voTempOrd.getSKU(),
-        voTempOrd.getLOTNO());
-
-    packageDefaultPrice(price, sDefaultPrice, packageId);
-
-    this.setPriceToTempOrd(orderDataBean, voTempOrd, price, false);
   }
 
   public List<ValidationDataBean> validate(OrderDataBean orderDataBean) throws Exception {
